@@ -6,7 +6,8 @@
 
     extern int yylex(void);
     void yyerror(const char *s);
-    extern FILE *asm_out;
+
+    AST *root;
     %
 }
 
@@ -27,6 +28,9 @@
 
     program
     : BEGIN_KW stmt_list END_KW '.'
+{
+    root = $2;
+}
 {
     printf("Parsing Complete! AST Created.\n");
 };

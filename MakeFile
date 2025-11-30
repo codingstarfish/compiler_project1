@@ -1,0 +1,37 @@
+# 컴파일러 및 플래그 설정
+CC = gcc
+CFLAGS = -g -w
+# -g: 디버깅 정보 포함
+# -w: 모든 경고 무시 (Bison/Flex 생성 코드 경고 방지)
+
+# 실행 파일 이름
+TARGET = pasCal
+
+# 소스 파일 및 헤더
+SRCS = main.c parser.tab.c lex.yy.c ast.c codegen.c
+HDRS = ast.h parser.tab.h
+
+# 기본 타겟: 컴파일러 빌드
+all: $(TARGET)
+
+# 컴파일러 실행 파일 생성 규칙
+$(TARGET): $(SRCS) $(HDRS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(SRCS)
+
+# Bison: parser.y -> parser.tab.c, parser.tab.h
+parser.tab.c parser.tab.h: parser.y
+	bison -d parser.y
+
+# Flex: scanner.l -> lex.yy.c
+lex.yy.c: scanner.l parser.tab.h
+	flex scanner.l
+
+# 테스트 실행: 컴파일러 빌드 -> 소스 컴파일 -> 어셈블리 실행
+test: $(TARGET)
+	./$(TARGET) program.txt
+	gcc -o program out.s
+	./program
+
+# 청소: 생성된 파일 삭제
+clean:
+	rm -f $(TARGET) parser.tab.c parser.tab.h lex.yy.c out.s program pasCal.exe program.exe

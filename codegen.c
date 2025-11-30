@@ -5,17 +5,19 @@
 
 extern FILE* asm_out;
 
+/* 변수 위치를 저장할 간단한 심볼 테이블 (스택 오프셋 관리용) */
 typedef struct {
     char* name;
-    int offset;
+    int offset; // 예: -8, -16 ...
 } Symbol;
 
 #define MAX_SYMBOLS 100
 static Symbol sym_table[MAX_SYMBOLS];
 static int sym_count = 0;
 static int current_stack_offset = 0;
-static int label_seq = 0;
+static int label_seq = 0; // 라벨 번호 생성용 (L0, L1...)
 
+/* 변수 오프셋 찾기 */
 static int get_var_offset(char* name) {
     for (int i = 0; i < sym_count; i++) {
         if (strcmp(sym_table[i].name, name) == 0) {
@@ -26,6 +28,7 @@ static int get_var_offset(char* name) {
     exit(1);
 }
 
+/* 변수 새로 등록 (선언 시) */
 static void add_var(char* name) {
     if (sym_count >= MAX_SYMBOLS) {
         fprintf(stderr, "Error: Too many variables\n");
@@ -37,6 +40,7 @@ static void add_var(char* name) {
     sym_count++;
 }
 
+/* 수식(Expression) 코드 생성 */
 void gen_expr(AST* node) {
     if (!node) return;
     int offset;
@@ -88,7 +92,9 @@ void gen_expr(AST* node) {
 // Forward declaration
 void gen_stmt(AST* node);
 
-// 연결된 문장 리스트를 순차적으로 실행하는 헬퍼 함수
+/* * 연결된 문장 리스트를 순차적으로 실행하는 헬퍼 함수 
+ * (while 블록 등에서 여러 문장을 처리하기 위해 필수)
+ */
 void gen_seq(AST* node) {
     while (node != NULL) {
         gen_stmt(node);
@@ -96,14 +102,17 @@ void gen_seq(AST* node) {
     }
 }
 
+/* 문장(Statement) 코드 생성 */
 void gen_stmt(AST* node) {
     if (!node) return;
     int offset, l1, l2;
 
     switch (node->type) {
         case AST_VAR_DECL:
+            /* * 수정됨: 여기서 subq를 하지 않고 main 시작부에서 한 번에 할당합니다. 
+             * 오프셋만 심볼 테이블에 등록합니다.
+             */
             add_var(node->sval);
-            fprintf(asm_out, "    subq $8, %%rsp\n");
             break;
 
         case AST_ASSIGN:
@@ -114,10 +123,22 @@ void gen_stmt(AST* node) {
 
         case AST_PRINTF:
             gen_expr(node->left);
-            fprintf(asm_out, "    movq %%rax, %%rsi\n");
-            fprintf(asm_out, "    leaq .LC0(%%rip), %%rdi\n");
-            fprintf(asm_out, "    movq $0, %%rax\n");
+            
+            /* OS별 호출 규약(ABI) 분기 처리 */
+#if defined(_WIN32) || defined(_WIN64)
+            /* Windows x64 Calling Convention (RCX, RDX, R8, R9) + Shadow Space 32bytes */
+            fprintf(asm_out, "    movq %%rax, %%rdx\n");       // Arg2: 값 -> RDX
+            fprintf(asm_out, "    leaq .LC0(%%rip), %%rcx\n"); // Arg1: 포맷 -> RCX
+            fprintf(asm_out, "    subq $32, %%rsp\n");         // Shadow Space 확보
             fprintf(asm_out, "    call printf\n");
+            fprintf(asm_out, "    addq $32, %%rsp\n");         // Shadow Space 정리
+#else
+            /* System V AMD64 ABI (Linux/Mac) (RDI, RSI, RDX, RCX) */
+            fprintf(asm_out, "    movq %%rax, %%rsi\n");       // Arg2: 값 -> RSI
+            fprintf(asm_out, "    leaq .LC0(%%rip), %%rdi\n"); // Arg1: 포맷 -> RDI
+            fprintf(asm_out, "    movq $0, %%rax\n");          // 가변 인자(float) 개수 0
+            fprintf(asm_out, "    call printf\n");
+#endif
             break;
 
         case AST_WHILE:
@@ -128,7 +149,7 @@ void gen_stmt(AST* node) {
             fprintf(asm_out, "    cmpq $0, %%rax\n");
             fprintf(asm_out, "    je L%d\n", l2);
 
-            // 중요: while 바디가 블록(여러 문장)일 수 있으므로 리스트 순회 실행
+            /* 중요: while 바디가 블록(여러 문장)일 수 있으므로 리스트 순회 실행 */
             gen_seq(node->right);
             
             fprintf(asm_out, "    jmp L%d\n", l1);
@@ -140,6 +161,7 @@ void gen_stmt(AST* node) {
     }
 }
 
+/* 프로그램 전체 코드 생성 진입점 */
 void gen_code(AST* root) {
     if (!root) return;
 
@@ -152,10 +174,16 @@ void gen_code(AST* root) {
     fprintf(asm_out, "main:\n");
     fprintf(asm_out, "    pushq %%rbp\n");
     fprintf(asm_out, "    movq %%rsp, %%rbp\n");
+    
+    /* * 수정됨: 스택 공간 1024바이트를 미리 확보하여 16바이트 정렬 유지 
+     * (System V AMD64 ABI 요구사항 충족)
+     */
+    fprintf(asm_out, "    subq $1024, %%rsp\n");
 
     // 전체 프로그램 문장 리스트 실행
     gen_seq(root);
 
+    fprintf(asm_out, "    movq $0, %%rax\n"); // 리턴값 0
     fprintf(asm_out, "    leave\n");
     fprintf(asm_out, "    ret\n");
 }

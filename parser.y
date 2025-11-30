@@ -10,6 +10,12 @@ extern FILE* asm_out;
 AST* root;
 %}
 
+/* ✨ 중요: parser.tab.h 헤더 파일에도 ast.h를 포함시킵니다.
+   이게 없으면 %union에서 AST 타입을 사용할 때 에러가 납니다. */
+%code requires {
+    #include "ast.h"
+}
+
 %union {
     int   ival;
     char* sval;

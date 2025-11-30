@@ -51,7 +51,8 @@ BlockStmt   ::= 'begin' StatementList 'end'
 ### 수식 (Expression)
 
 Expression  ::= AddExpr
-              | Expression '<' AddExpr  /* 비교 연산 */
+              | Expression '<' AddExpr 
+              | Expression '>' AddExpr
 
 AddExpr     ::= Term
               | AddExpr '+' Term

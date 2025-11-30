@@ -1,31 +1,33 @@
 # compiler_project1
-Konkuk University compiler class final project
-### 언어개요 및 설계의도
+Konkuk University compiler class end of semester project
+## 언어개요 및 설계의도(Language Overview)
 
-#### 언어 명칭(laneguage name):
+### 언어 명칭(laneguage name):
 pasCal
 
-#### 설계 의도(Design Intent):
+### 설계 의도(Design Intent):
 
 C언어의 간결한 수식 표현과 Pascal 언어의 명확한 블록구조를 합처서 읽기 쉽고 파싱하기 쉬운 언어를 목표로 합니다.
 
 With combination of simple mathematical expression from C language and clear block structure of Pascal Language, pasCal aims to readable and easily parsable language 
 
-#### 문법 정의(Grammar):
+## 문법 정의(Grammar):
 
 이 문법은 EBNF 표기법을 따릅니다.
 
-/* 1. 프로그램의 전체 구조 */
+Grammar is defined in EBNF 
+
+### 프로그램의 전체 구조 (Structure of the program)
 
 Program     ::= 'begin' StatementList 'end' '.'
 
 
-/* 2. 문장 리스트 */
+### 문장 리스트(Statement List) 
 
 StatementList ::= Statement
                 | StatementList Statement
 
-/* 3. 문장의 종류 */
+### 문장의 종류 (Statements)
 
 Statement   ::= Declaration
                 | Assignment
@@ -33,26 +35,21 @@ Statement   ::= Declaration
                 | PrintStmt
                 | BlockStmt ';'
 
+### 세부 규칙 (Statement Details)
 
-/* 4. 세부 규칙 */
-
-
-/* 변수 선언: int x; */
 Declaration ::= 'int' IDENTIFIER ';'
 
-/* 대입 연산: x = 10; */
 Assignment  ::= IDENTIFIER '=' Expression ';'
 
-/* 반복문: while 조건 do 문장 */
 Loop        ::= 'while' Expression 'do' Statement
 
-/* 출력문: print(x); */
 PrintStmt   ::= 'print' '(' Expression ')' ';'
 
-/* 블록: begin ... end (내부 블록) */
 BlockStmt   ::= 'begin' StatementList 'end'
 
-/* 5. 수식 (Expression) - 우선순위 반영 */
+
+### 수식 (Expression)
+
 Expression  ::= AddExpr
               | Expression '<' AddExpr  /* 비교 연산 */
 
@@ -67,3 +64,7 @@ Term        ::= Factor
 Factor      ::= NUMBER
               | IDENTIFIER
               | '(' Expression ')' 
+
+## 빌드방법
+## 실행방법
+## 의존성

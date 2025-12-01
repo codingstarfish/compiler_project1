@@ -1,0 +1,28 @@
+begin
+	int a;
+	a = 10;
+	if a == 10 do
+	begin
+		print(a);
+	end;
+	if a != 10 do
+	begin
+		print(a);
+	end;
+	if a <= 10 do
+	begin
+		print(a);
+	end;
+	if a >= 10 do
+	begin
+		print(a);
+	end;
+	if a > 10 do
+	begin
+		print(a);
+	end;
+	if a < 10 do
+	begin
+		print(a);
+	end;
+end.

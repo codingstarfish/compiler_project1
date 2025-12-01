@@ -1,0 +1,19 @@
+begin
+    int a;
+    int b;
+    int c;
+    a = 10;
+    b = 20;
+    c = 30;
+    
+    // (A and B) or (not C) 테스트
+    if (a < b) and (b < c) do
+    begin
+        print(1); // 참
+    end;
+    
+    if (a > b) or (not (b > c)) do
+    begin
+        print(2); // 참 (뒷부분이 참)
+    end;
+end.

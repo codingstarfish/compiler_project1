@@ -1,0 +1,22 @@
+begin
+    int a;
+    int b;
+
+    // 테스트 값: 56과 42의 최대공약수는 14
+    a = 56;
+    b = 42;
+
+    while a != b do
+    begin
+        if a > b do
+        begin
+            a = a - b;
+        end;
+        else do
+        begin
+            b = b - a;
+        end;
+    end;
+
+    print(a);
+end.

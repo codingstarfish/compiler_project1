@@ -1,0 +1,11 @@
+begin
+	int a;
+	int b;
+	int c;
+	a = 10;
+	b = 20;
+	c = a+b;
+	print(c);
+	c = 10+10;
+	print(c);
+end.

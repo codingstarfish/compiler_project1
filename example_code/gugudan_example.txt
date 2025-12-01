@@ -1,0 +1,17 @@
+begin
+    int i;
+    int j;
+    int k;
+    i = 2;
+    while i < 4 do // 2단, 3단만 출력
+    begin
+        j = 1;
+        while j < 4 do // x1, x2, x3만 출력
+        begin
+            k = i * j;
+            print(k);
+            j = j + 1;
+        end;
+        i = i + 1;
+    end;
+end.

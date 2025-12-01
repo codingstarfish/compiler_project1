@@ -1,0 +1,42 @@
+begin
+	int a;
+	int b;
+	int c;
+	a = 10;
+	b = 20;
+
+	c = a + b;
+	print(c);
+	c = a + 10;
+	print(c);
+	c = 20+30;
+	print(c);
+
+	c = a-b;
+	print(c);
+	c = a-20;
+	print(c);
+	c = 10-30;
+	print(c);
+
+	c = b/a;
+	print(c);
+	c = 10/a;
+	print(c);
+	c = b/2;
+	print(c);
+	
+	c = a*b;
+	print(c);
+	c = a*10;
+	print(c);
+	c = 10*10;
+	print(c);
+	
+	c = a+10*b;
+	print(c);
+	c = (a+10)*b;
+	print(c);
+	c = 10/(5+5);
+	print(c);
+end.

@@ -1,0 +1,23 @@
+begin
+    int n;
+    int t1;
+    int t2;
+    int nextTerm;
+    
+    n = 10; // 10번째 항까지 출력
+    t1 = 0;
+    t2 = 1;
+    
+    print(t1);
+    print(t2);
+    
+    n = n - 2;
+    while n > 0 do
+    begin
+        nextTerm = t1 + t2;
+        print(nextTerm);
+        t1 = t2;
+        t2 = nextTerm;
+        n = n - 1;
+    end;
+end.

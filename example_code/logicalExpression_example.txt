@@ -1,0 +1,21 @@
+int a;
+int b;
+a = 10;
+b = 20;
+
+if (a==10) and (b==20) do
+begin
+	print(1);
+end;
+
+if (a==5) or (b==20) do
+begin
+	print(2);
+end;
+
+if (not (a==5)) and (b==20) do
+begin
+	print(3);
+end;
+
+ 

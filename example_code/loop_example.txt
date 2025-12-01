@@ -1,0 +1,12 @@
+begin
+	int sum;
+	int i;
+	i = 0;
+	sum = 0;
+	while i <11 do
+	begin
+		sum=sum+i;
+		i=i+1;
+	end;
+	print(sum);
+end.

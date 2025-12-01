@@ -23,7 +23,7 @@ typedef enum {
     /* 제어 */
     AST_PRINTF,
     AST_WHILE,
-    AST_IF,          // if 문 추가
+    AST_IF,          // if 문
     AST_STMT_LIST
 } NodeType;
 
@@ -33,7 +33,8 @@ typedef struct AST {
     char* sval;
     struct AST* left;
     struct AST* right;
-    struct AST* next;  // 리스트 연결 또는 if문의 else 블록 저장용
+    struct AST* next;      // 다음 문장 연결용 (Linked List)
+    struct AST* else_body; 
 } AST;
 
 AST* ast_int(int value);
@@ -41,10 +42,10 @@ AST* ast_var(char* name);
 AST* ast_var_decl(char* name, AST* init);
 AST* ast_assign(AST* var, AST* expr);
 AST* ast_bin(NodeType type, AST* left, AST* right);
-AST* ast_unary(NodeType type, AST* left); /* 단항 연산(not) 추가 */
+AST* ast_unary(NodeType type, AST* left);
 AST* ast_printf(AST* expr);
 AST* ast_while(AST* cond, AST* body);
-AST* ast_if(AST* cond, AST* then_body, AST* else_body); /* if 추가 */
+AST* ast_if(AST* cond, AST* then_body, AST* else_body);
 AST* ast_stmt_list(AST* head, AST* tail);
 void ast_free(AST* node);
 

@@ -15,6 +15,7 @@ static AST* make_node(NodeType type) {
     node->left = NULL;
     node->right = NULL;
     node->next = NULL;
+    node->else_body = NULL;
     return node;
 }
 
@@ -51,7 +52,6 @@ AST* ast_bin(NodeType type, AST* left, AST* right) {
     return node;
 }
 
-/* 단항 연산 (Not) */
 AST* ast_unary(NodeType type, AST* left) {
     AST* node = make_node(type);
     node->left = left;
@@ -71,12 +71,11 @@ AST* ast_while(AST* cond, AST* body) {
     return node;
 }
 
-/* If-Else 노드 생성 */
 AST* ast_if(AST* cond, AST* then_body, AST* else_body) {
     AST* node = make_node(AST_IF);
     node->left = cond;
     node->right = then_body;
-    node->next = else_body; // next 필드를 else 블록 저장용으로 활용
+    node->else_body = else_body; 
     return node;
 }
 
@@ -95,6 +94,7 @@ void ast_free(AST* node) {
     ast_free(node->left);
     ast_free(node->right);
     ast_free(node->next);
+    ast_free(node->else_body); 
     if (node->sval != NULL) free(node->sval);
     free(node);
 }

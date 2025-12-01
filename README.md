@@ -88,10 +88,10 @@ $$
 
 ```mermaid
 graph LR
-    A[Source Code<br/>(*.txt)] -->|Lexer| B[Tokens]
-    B -->|Parser| C[AST<br/>(Abstract Syntax Tree)]
-    C -->|Code Generator| D[x86 Assembly<br/>(out.s)]
-    D -->|GCC| E[Executable<br/>(*.exe)]
+    A["Source Code"] -->|Lexer| B["Tokens"]
+    B -->|Parser| C["AST<br/>(Abstract Syntax Tree)"]
+    C -->|Code Generator| D["x86 Assembly<br/>(out.s)"]
+    D -->|GCC| E["Executable<br/>(*.exe)"]
 ```
 ### 3.1 모듈별 역할
 

@@ -13,11 +13,11 @@
 "print"     { return PRINT_KW; }
 "while"     { return WHILE_KW; }
 "do"        { return DO_KW; }
-"if"        { return IF_KW; }     /* 추가됨 */
-"else"      { return ELSE_KW; }   /* 추가됨 */
-"and"       { return AND_OP; }    /* 추가됨 */
-"or"        { return OR_OP; }     /* 추가됨 */
-"not"       { return NOT_OP; }    /* 추가됨 */
+"if"        { return IF_KW; }   
+"else"      { return ELSE_KW; }   
+"and"       { return AND_OP; }  
+"or"        { return OR_OP; }  
+"not"       { return NOT_OP; }    
 
 [0-9]+      { yylval.ival = atoi(yytext); return NUMBER; }
 [a-zA-Z_][a-zA-Z0-9_]* { yylval.sval = strdup(yytext); return IDENT; }
@@ -28,10 +28,10 @@
 "/"         { return '/'; }
 "="         { return '='; }
 
-"=="        { return EQ_OP; }     /* == 추가 */
-"!="        { return NE_OP; }     /* != 추가 */
-"<="        { return LE_OP; }     /* <= 추가 */
-">="        { return GE_OP; }     /* >= 추가 */
+"=="        { return EQ_OP; }    
+"!="        { return NE_OP; }    
+"<="        { return LE_OP; }  
+">="        { return GE_OP; }   
 "<"         { return '<'; }
 ">"         { return '>'; }
 

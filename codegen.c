@@ -54,7 +54,7 @@ void gen_expr(AST* node) {
         case AST_NOT:
             gen_expr(node->left);
             fprintf(asm_out, "    cmpq $0, %%rax\n");
-            fprintf(asm_out, "    sete %%al\n");       // 0이면 1, 아니면 0
+            fprintf(asm_out, "    sete %%al\n");
             fprintf(asm_out, "    movzbq %%al, %%rax\n");
             break;
 
@@ -66,37 +66,53 @@ void gen_expr(AST* node) {
             fprintf(asm_out, "    popq %%rbx\n"); // rbx=Left, rax=Right
 
             switch (node->type) {
-                case AST_ADD: fprintf(asm_out, "    addq %%rbx, %%rax\n"); break; // 덧셈은 교환법칙 성립
+                case AST_ADD: fprintf(asm_out, "    addq %%rbx, %%rax\n"); break; 
                 case AST_SUB: 
                     fprintf(asm_out, "    subq %%rax, %%rbx\n"); 
                     fprintf(asm_out, "    movq %%rbx, %%rax\n");
                     break;
                 case AST_MUL: fprintf(asm_out, "    imulq %%rbx, %%rax\n"); break;
+                
                 case AST_DIV:
-                    fprintf(asm_out, "    movq %%rbx, %%rax\n");
+                    fprintf(asm_out, "    movq %%rax, %%rcx\n"); 
+                    fprintf(asm_out, "    movq %%rbx, %%rax\n"); 
                     fprintf(asm_out, "    cqo\n");
-                    fprintf(asm_out, "    idivq %%rax\n"); // rbx를 rax로 나눔
+                    fprintf(asm_out, "    idivq %%rcx\n");
                     break;
                 
                 /* 비교 연산 */
                 case AST_LT:
+                    fprintf(asm_out, "    cmpq %%rax, %%rbx\n");
+                    fprintf(asm_out, "    setl %%al\n");
+                    fprintf(asm_out, "    movzbq %%al, %%rax\n");
+                    break;
                 case AST_GT:
+                    fprintf(asm_out, "    cmpq %%rax, %%rbx\n");
+                    fprintf(asm_out, "    setg %%al\n");
+                    fprintf(asm_out, "    movzbq %%al, %%rax\n");
+                    break;
                 case AST_LE:
+                    fprintf(asm_out, "    cmpq %%rax, %%rbx\n");
+                    fprintf(asm_out, "    setle %%al\n");
+                    fprintf(asm_out, "    movzbq %%al, %%rax\n");
+                    break;
                 case AST_GE:
+                    fprintf(asm_out, "    cmpq %%rax, %%rbx\n");
+                    fprintf(asm_out, "    setge %%al\n");
+                    fprintf(asm_out, "    movzbq %%al, %%rax\n");
+                    break;
                 case AST_EQ:
+                    fprintf(asm_out, "    cmpq %%rax, %%rbx\n");
+                    fprintf(asm_out, "    sete %%al\n");
+                    fprintf(asm_out, "    movzbq %%al, %%rax\n");
+                    break;
                 case AST_NE:
-                    fprintf(asm_out, "    cmpq %%rax, %%rbx\n"); // Left(rbx) vs Right(rax)
-                    if (node->type == AST_LT) fprintf(asm_out, "    setl %%al\n");
-                    else if (node->type == AST_GT) fprintf(asm_out, "    setg %%al\n");
-                    else if (node->type == AST_LE) fprintf(asm_out, "    setle %%al\n");
-                    else if (node->type == AST_GE) fprintf(asm_out, "    setge %%al\n");
-                    else if (node->type == AST_EQ) fprintf(asm_out, "    sete %%al\n");
-                    else if (node->type == AST_NE) fprintf(asm_out, "    setne %%al\n");
-                    
+                    fprintf(asm_out, "    cmpq %%rax, %%rbx\n");
+                    fprintf(asm_out, "    setne %%al\n");
                     fprintf(asm_out, "    movzbq %%al, %%rax\n");
                     break;
 
-                /* 논리 연산 (비트 연산으로 간략화) */
+                /* 논리 연산 */
                 case AST_AND: fprintf(asm_out, "    andq %%rbx, %%rax\n"); break;
                 case AST_OR:  fprintf(asm_out, "    orq %%rbx, %%rax\n"); break;
             }
@@ -115,7 +131,7 @@ void gen_seq(AST* node) {
 
 void gen_stmt(AST* node) {
     if (!node) return;
-    int offset, l1, l2, l3;
+    int offset, l1, l2;
 
     switch (node->type) {
         case AST_VAR_DECL:
@@ -156,27 +172,23 @@ void gen_stmt(AST* node) {
             fprintf(asm_out, "L%d:\n", l2);
             break;
 
-        /* IF-ELSE 구현 */
         case AST_IF:
-            l1 = label_seq++; // Else 또는 End 라벨
-            l2 = label_seq++; // End 라벨
+            l1 = label_seq++; // Else
+            l2 = label_seq++; // End
             
-            gen_expr(node->left); // 조건 계산
+            gen_expr(node->left);
             fprintf(asm_out, "    cmpq $0, %%rax\n");
-            fprintf(asm_out, "    je L%d\n", l1); // 거짓이면 Else/End로 점프
+            fprintf(asm_out, "    je L%d\n", l1); // 거짓이면 Else로 점프
 
-            // Then 블록 실행
-            gen_seq(node->right);
-            fprintf(asm_out, "    jmp L%d\n", l2); // 끝나면 End로 점프
+            gen_seq(node->right); // 참일 때 실행
+            fprintf(asm_out, "    jmp L%d\n", l2); // 실행 후 End로 점프
 
-            // Else 블록 (존재할 경우)
-            fprintf(asm_out, "L%d:\n", l1);
-            if (node->next != NULL) { // next에 else_body가 저장됨
-                gen_seq(node->next);
+            fprintf(asm_out, "L%d:\n", l1); // Else 블록
+            if (node->else_body != NULL) {  
+                gen_seq(node->else_body);
             }
             
-            // End 라벨
-            fprintf(asm_out, "L%d:\n", l2);
+            fprintf(asm_out, "L%d:\n", l2); // 종료
             break;
 
         default:

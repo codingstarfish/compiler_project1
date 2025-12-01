@@ -65,7 +65,7 @@ stmt
     /* if 조건 do 문장 */
     | IF_KW expr DO_KW stmt         { $$ = ast_if($2, $4, NULL); }
     
-    /* if 조건 do 문장 else do 문장 (예제 코드 스타일 반영) */
+    /* if 조건 do 문장 else do 문장 */
     | IF_KW expr DO_KW stmt ELSE_KW DO_KW stmt { $$ = ast_if($2, $4, $7); }
 
     | block ';'                     { $$ = $1; }

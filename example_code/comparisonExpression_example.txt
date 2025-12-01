@@ -3,26 +3,26 @@ begin
 	a = 10;
 	if a == 10 do
 	begin
-		print(a);
+		print(1);
 	end;
 	if a != 10 do
 	begin
-		print(a);
+		print(2);
 	end;
 	if a <= 10 do
 	begin
-		print(a);
+		print(3);
 	end;
 	if a >= 10 do
 	begin
-		print(a);
+		print(4);
 	end;
 	if a > 10 do
 	begin
-		print(a);
+		print(5);
 	end;
 	if a < 10 do
 	begin
-		print(a);
+		print(6);
 	end;
 end.

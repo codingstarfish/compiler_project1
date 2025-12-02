@@ -167,10 +167,4 @@ gcc -o program out.s
 # 3. 결과 실행
 ./program.exe
 ```
-
-### 5.4 테스트 (자동 실행)
-
-```bash
-make test
-```
     
